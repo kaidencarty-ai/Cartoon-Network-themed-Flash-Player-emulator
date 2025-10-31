@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Cartoon Network Menu</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cartoon Network Hub</title>
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 <style>
 body {
-  font-family: 'Arial', sans-serif;
   margin: 0;
-  padding: 0;
-  text-align: center;
+  font-family: "Arial Black", sans-serif;
   background-color: #FF6F00;
-  overflow: hidden;
   color: white;
+  overflow: hidden;
+  text-align: center;
 }
 
-/* Floating bubbles */
+/* Bubbles */
 .bubble {
   position: absolute;
   border-radius: 50%;
@@ -27,33 +28,37 @@ body {
   100% { transform: translateY(-100px) translateX(50px); }
 }
 
-/* CN Logo */
-#logo {
-  width: 220px;
-  margin-top: 40px;
-}
-
-/* Menu buttons */
-.menu {
+/* Menu */
+#mainMenu {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -40%);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: #FF6F00;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.7s;
 }
-
+#mainMenu.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+#logo {
+  width: 220px;
+  margin-bottom: 40px;
+}
 .menu button {
   background-color: #ffcc00;
   border: 3px solid #000;
   border-radius: 12px;
   padding: 15px 30px;
-  font-size: 1.5em;
+  font-size: 1.3em;
   font-weight: bold;
   cursor: pointer;
   color: black;
   text-shadow: 1px 1px 0 #fff;
+  margin: 10px;
   transition: transform 0.2s, background 0.2s;
 }
 .menu button:hover {
@@ -61,296 +66,165 @@ body {
   transform: scale(1.05);
 }
 
-/* Fade animations */
-#mainPlayer {
+/* Web Player */
+#webPlayer {
   display: none;
   opacity: 0;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.7s;
 }
-#mainPlayer.visible {
-  display: block;
-  opacity: 1;
-}
-#mainMenu {
-  transition: opacity 0.7s ease;
-}
-.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
+#webPlayer.visible { display: block; opacity: 1; }
 
-/* Player styling (same as before) */
-#playerBody {
-  font-family: 'Arial', sans-serif;
-  background-color: #FF6F00;
+/* Flash Player */
+#flashPlayer {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.7s;
+}
+#flashPlayer.visible { display: block; opacity: 1; }
+
+/* Flash Player Styles */
+#flashContainer {
+  background: repeating-linear-gradient(45deg, #000 0, #000 25px, #fff 25px, #fff 50px);
+  background-size: 200% 200%;
+  animation: checkerMove 8s linear infinite;
   color: white;
   text-align: center;
   overflow-x: hidden;
-  position: relative;
-  padding-bottom: 40px;
+  height: 100vh;
 }
-
-h1 {
-  text-shadow: 2px 2px 4px #000;
+@keyframes checkerMove {
+  from { background-position: 0 0; }
+  to { background-position: 100% 100%; }
 }
-
-video {
-  max-width: 80%;
-  border: 4px solid #fff;
-  border-radius: 12px;
-  margin-top: 10px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+#flashHeader {
+  background: #000;
+  padding: 20px;
+  border-bottom: 6px solid #00b8ff;
 }
-
-button {
-  background-color: #ffcc00;
-  color: black;
-  border: 2px solid #000;
-  border-radius: 8px;
-  padding: 5px 12px;
-  cursor: pointer;
-  font-weight: bold;
-  text-shadow: 1px 1px 0 #fff;
-  transition: all 0.2s ease;
+.cn-logo {
+  background: #fff;
+  color: #000;
+  padding: 10px 20px;
+  border: 4px solid #000;
+  box-shadow: 5px 5px 0 #00b8ff;
+  display: inline-block;
+  margin-bottom: 20px;
 }
-button:hover {
-  background-color: #ffd633;
-  transform: translateY(-2px);
-  box-shadow: 2px 4px 6px rgba(0,0,0,0.5);
-}
-button.delete {
-  background-color: #ff4c4c;
-  color: #fff;
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  padding: 0;
-  font-size: 16px;
-  line-height: 20px;
-}
-button.delete:hover {
-  background-color: #ff1a1a;
-  transform: scale(1.1);
-}
-input[type="text"], input[type="file"], select {
-  border-radius: 8px;
-  border: 2px solid #000;
-  padding: 5px 10px;
-  margin: 5px;
-  font-size: 1em;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-}
-.folder, .video-item, .standalone-video {
-  background: rgba(0,0,0,0.7);
-  margin: 6px 0;
-  padding: 10px;
+#player {
+  margin: 20px auto;
+  border: 10px solid #00b8ff;
+  background: #000;
+  width: 90%;
+  max-width: 800px;
+  height: 60vh;
+  box-shadow: 0 0 30px #00b8ff;
+  display: inline-block;
   border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 30px #00b8ff; }
+  50% { box-shadow: 0 0 60px #00b8ff; }
+}
+button.back {
+  background: #00b8ff;
+  border: 3px solid #000;
+  color: #000;
   font-weight: bold;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-  transition: transform 0.1s, background 0.2s;
+  font-size: 1em;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  transition: all 0.15s ease-in-out;
+  margin-bottom: 10px;
 }
-.folder:hover, .video-item:hover, .standalone-video:hover {
-  background: rgba(50,50,50,0.8);
-  transform: scale(1.02);
+button.back:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #00b8ff, 6px 6px 0 #000;
 }
-.folder-header { cursor: pointer; }
-.folder-videos { display: none; margin-left: 20px; }
-
 </style>
 </head>
 <body>
 
-<!-- Bubbles container -->
+<!-- Bubbles -->
 <div id="bubbles"></div>
 
-<!-- MENU SCREEN -->
+<!-- MENU -->
 <div id="mainMenu">
   <img id="logo" src="https://upload.wikimedia.org/wikipedia/commons/6/66/Cartoon_Network_2010_logo.svg">
   <div class="menu">
-    <button id="openPlayer">🎬 Cartoon Network Web Player</button>
-    <button onclick="alert('More coming soon!')">🕹️ Games</button>
-    <button onclick="alert('More coming soon!')">📺 Shows</button>
+    <button id="openWebPlayer">🎬 Cartoon Network Web Player</button>
+    <button id="openFlashPlayer">💾 Cartoon Network Flash Player</button>
   </div>
 </div>
 
-<!-- PLAYER SCREEN -->
-<div id="mainPlayer">
-  <div id="playerBody">
-    <img id="logo" src="https://upload.wikimedia.org/wikipedia/commons/6/66/Cartoon_Network_2010_logo.svg" alt="Cartoon Network">
-    <h1>🎬 Cartoon Network Player</h1>
-    <video id="videoPlayer" controls></video><br>
-
-    <input type="text" id="folderName" placeholder="Folder Name">
-    <button id="createFolder">Create Folder</button><br>
-
-    <select id="folderSelect"><option value="">-- Add Video to Folder (optional) --</option></select>
-    <input type="file" id="uploadVideo" accept="video/*">
-    <input type="file" id="uploadFolderBg" accept="image/*">
-    <input type="file" id="uploadMusic" accept="audio/*">
-
-    <ul id="playlist"></ul>
+<!-- FLASH PLAYER SCREEN -->
+<div id="flashPlayer">
+  <div id="flashContainer">
+    <div id="flashHeader">
+      <span class="cn-logo">CARTOON NETWORK</span>
+      <h1>Flash Player Revival</h1>
+    </div>
+    <button class="back" onclick="goHome()">⬅ Back to Menu</button>
+    <main>
+      <div id="player">
+        <ruffle-player src="your_game.swf"></ruffle-player>
+      </div>
+    </main>
+    <footer>
+      <p>Powered by <a href="https://ruffle.rs/" target="_blank">Ruffle</a> | © Cartoon Network</p>
+    </footer>
   </div>
+</div>
+
+<!-- WEB PLAYER (your modern player) -->
+<div id="webPlayer">
+  <iframe src="your_web_player.html" style="border:none;width:100%;height:100vh;"></iframe>
 </div>
 
 <script>
 // Floating bubbles
 function createBubble() {
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  const size = Math.random() * 40 + 20;
-  bubble.style.width = `${size}px`;
-  bubble.style.height = `${size}px`;
-  bubble.style.left = `${Math.random() * window.innerWidth}px`;
-  bubble.style.backgroundColor = `rgba(255,255,255,${Math.random() * 0.5 + 0.2})`;
-  bubble.style.animationDuration = `${Math.random() * 10 + 5}s`;
-  document.body.appendChild(bubble);
-  setTimeout(() => bubble.remove(), 15000);
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  const s = Math.random() * 40 + 20;
+  b.style.width = `${s}px`;
+  b.style.height = `${s}px`;
+  b.style.left = `${Math.random() * window.innerWidth}px`;
+  b.style.backgroundColor = `rgba(255,255,255,${Math.random() * 0.5 + 0.2})`;
+  b.style.animationDuration = `${Math.random() * 10 + 5}s`;
+  document.body.appendChild(b);
+  setTimeout(()=>b.remove(),15000);
 }
-setInterval(createBubble, 500);
+setInterval(createBubble,500);
 
-// Menu transition
-const menu = document.getElementById('mainMenu');
-const player = document.getElementById('mainPlayer');
-document.getElementById('openPlayer').onclick = () => {
-  menu.classList.add('hidden');
-  setTimeout(() => {
-    menu.style.display = 'none';
-    player.classList.add('visible');
-  }, 700);
+// DOM
+const menu = document.getElementById("mainMenu");
+const webPlayer = document.getElementById("webPlayer");
+const flashPlayer = document.getElementById("flashPlayer");
+
+document.getElementById("openWebPlayer").onclick = () => {
+  menu.classList.add("hidden");
+  setTimeout(()=>{
+    menu.style.display="none";
+    webPlayer.classList.add("visible");
+  },700);
 };
 
-// Player logic
-let folders = JSON.parse(localStorage.getItem('cnFolders') || '[]');
-let standaloneVideos = JSON.parse(localStorage.getItem('cnStandalone') || '[]');
-const playlistEl = document.getElementById('playlist');
-const videoPlayer = document.getElementById('videoPlayer');
-const folderSelect = document.getElementById('folderSelect');
-const body = document.body;
-const audio = new Audio(); audio.loop = true;
+document.getElementById("openFlashPlayer").onclick = () => {
+  menu.classList.add("hidden");
+  setTimeout(()=>{
+    menu.style.display="none";
+    flashPlayer.classList.add("visible");
+  },700);
+};
 
-function saveData() {
-  localStorage.setItem('cnFolders', JSON.stringify(folders));
-  localStorage.setItem('cnStandalone', JSON.stringify(standaloneVideos));
-  renderFolderSelect();
+function goHome() {
+  webPlayer.classList.remove("visible");
+  flashPlayer.classList.remove("visible");
+  menu.style.display="flex";
+  setTimeout(()=>menu.classList.remove("hidden"),100);
 }
-function renderFolderSelect() {
-  folderSelect.innerHTML = '<option value="">-- Add Video to Folder (optional) --</option>';
-  folders.forEach((folder,index)=>{
-    const option = document.createElement('option');
-    option.value = index;
-    option.textContent = folder.name;
-    folderSelect.appendChild(option);
-  });
-}
-function renderPlaylist() {
-  playlistEl.innerHTML = '';
-  standaloneVideos.forEach((video,index)=>{
-    const li = document.createElement('li');
-    li.className='standalone-video';
-    li.textContent = video.name;
-    li.onclick = ()=>{
-      videoPlayer.src = video.url;
-      videoPlayer.play();
-      if(video.background) body.style.backgroundImage = `url('${video.background}')`;
-      if(video.music){ audio.src = video.music; audio.play();}
-    };
-    const delBtn=document.createElement('button');
-    delBtn.className='delete';
-    delBtn.textContent='✖';
-    delBtn.onclick=(e)=>{
-      e.stopPropagation();
-      standaloneVideos.splice(index,1);
-      saveData();
-      renderPlaylist();
-    };
-    li.appendChild(delBtn);
-    playlistEl.appendChild(li);
-  });
-  folders.forEach((folder,index)=>{
-    const folderLi = document.createElement('li');
-    folderLi.className = 'folder';
-    const header = document.createElement('div');
-    header.className = 'folder-header';
-    header.textContent = folder.name;
-    const delFolderBtn = document.createElement('button');
-    delFolderBtn.className='delete';
-    delFolderBtn.textContent='✖';
-    delFolderBtn.onclick=(e)=>{
-      e.stopPropagation();
-      folders.splice(index,1);
-      saveData();
-      renderPlaylist();
-    };
-    header.appendChild(delFolderBtn);
-    folderLi.appendChild(header);
-    const videosUl = document.createElement('ul');
-    videosUl.className='folder-videos';
-    folder.videos.forEach((video, vidIndex)=>{
-      const videoLi=document.createElement('li');
-      videoLi.className='video-item';
-      videoLi.textContent=video.name;
-      videoLi.onclick=()=>{
-        videoPlayer.src=video.url;
-        videoPlayer.play();
-        if(folder.background) body.style.backgroundImage=`url('${folder.background}')`;
-        if(folder.music){ audio.src=folder.music; audio.play();}
-      };
-      const delBtn=document.createElement('button');
-      delBtn.className='delete';
-      delBtn.textContent='✖';
-      delBtn.onclick=(e)=>{
-        e.stopPropagation();
-        folder.videos.splice(vidIndex,1);
-        saveData();
-        renderPlaylist();
-      };
-      videoLi.appendChild(delBtn);
-      videosUl.appendChild(videoLi);
-    });
-    folderLi.appendChild(videosUl);
-    header.onclick = ()=>{
-      const isVisible=videosUl.style.display==='block';
-      videosUl.style.display=isVisible?'none':'block';
-    };
-    playlistEl.appendChild(folderLi);
-  });
-}
-document.getElementById('createFolder').onclick = ()=>{
-  const name=document.getElementById('folderName').value.trim();
-  if(!name) return alert("Folder name required!");
-  folders.push({name,videos:[],background:'',music:''});
-  saveData(); renderPlaylist();
-  document.getElementById('folderName').value='';
-};
-document.getElementById('uploadVideo').onchange=(e)=>{
-  const file=e.target.files[0]; if(!file) return;
-  const selectedFolderIndex=folderSelect.value;
-  const url=URL.createObjectURL(file);
-  if(selectedFolderIndex===''){ standaloneVideos.push({name:file.name,url}); }
-  else { folders[selectedFolderIndex].videos.push({name:file.name,url}); }
-  saveData(); renderPlaylist();
-};
-document.getElementById('uploadFolderBg').onchange=(e)=>{
-  const file=e.target.files[0]; if(!file) return;
-  const selectedFolderIndex=folderSelect.value;
-  if(selectedFolderIndex==='') return alert("Select a folder!");
-  folders[selectedFolderIndex].background=URL.createObjectURL(file);
-  saveData(); alert("Background set!");
-};
-document.getElementById('uploadMusic').onchange=(e)=>{
-  const file=e.target.files[0]; if(!file) return;
-  const selectedFolderIndex=folderSelect.value;
-  if(selectedFolderIndex==='') return alert("Select a folder!");
-  folders[selectedFolderIndex].music=URL.createObjectURL(file);
-  saveData(); alert("Music set!");
-};
-renderFolderSelect();
-renderPlaylist();
 </script>
-
 </body>
 </html>
-
