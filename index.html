@@ -17,7 +17,6 @@
     color: white;
     text-align: center;
     transition: all 0.4s ease-in-out;
-    overflow-x: hidden;
   }
   @keyframes checkerMove {
     from { background-position: 0 0; }
@@ -151,70 +150,10 @@
   body.legacy-mode footer {
     color: #000;
   }
-
-  /* Splash Screen */
-  #splashScreen {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #000;
-    z-index: 2000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    animation: fadeOut 1s ease-out forwards;
-    animation-delay: 4.5s;
-  }
-  @keyframes fadeOut {
-    to { opacity: 0; visibility: hidden; }
-  }
-  .splash-logo {
-    font-size: 5em;
-    background: #fff;
-    color: #000;
-    padding: 15px 30px;
-    border: 6px solid #00b8ff;
-    box-shadow: 8px 8px 0 #00b8ff;
-    animation: bounce 1s ease-in-out infinite alternate;
-  }
-  @keyframes bounce {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-15px); }
-  }
-  .splash-text {
-    margin-top: 25px;
-    font-size: 1.2em;
-  }
-  .progress-bar {
-    width: 250px;
-    height: 20px;
-    border: 3px solid #00b8ff;
-    margin-top: 15px;
-    background: #111;
-    position: relative;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: #00b8ff;
-    width: 0;
-    animation: loadBar 4s linear forwards;
-  }
-  @keyframes loadBar {
-    to { width: 100%; }
-  }
 </style>
 </head>
 
 <body>
-  <!-- Splash Screen -->
-  <div id="splashScreen">
-    <div class="splash-logo">CN</div>
-    <div class="splash-text">Loading Game Assets...</div>
-    <div class="progress-bar"><div class="progress-fill"></div></div>
-  </div>
-
   <header>
     <h1><span class="cn-logo">CN</span> Flash Player</h1>
     <p>Relive the golden age of Cartoon Network Flash games!</p>
@@ -303,15 +242,10 @@
       localStorage.setItem("legacyMode", document.body.classList.contains("legacy-mode"));
     };
 
-    // Ruffle setup + splash
+    // Ruffle setup
     document.addEventListener("DOMContentLoaded", () => {
       const audio = document.getElementById("cnIntro");
       audio.play().catch(()=>{});
-
-      const splash = document.getElementById("splashScreen");
-      setTimeout(() => {
-        splash.style.display = "none";
-      }, 5500);
 
       const ruffle = window.RufflePlayer?.newest();
       const player = ruffle.createPlayer();
