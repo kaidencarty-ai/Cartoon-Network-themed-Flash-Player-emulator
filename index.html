@@ -1,123 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cartoon Network Flash Player</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartoon Network Player Hub</title>
 <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
-
 <style>
-  body {
-    font-family: "Arial Black", sans-serif;
-    margin: 0;
-    padding: 0;
-    background: repeating-linear-gradient(45deg, #000 0, #000 25px, #fff 25px, #fff 50px);
-    background-size: 200% 200%;
-    animation: checkerMove 8s linear infinite;
-    color: white;
-    text-align: center;
-  }
-  @keyframes checkerMove {
-    from { background-position: 0 0; }
-    to { background-position: 100% 100%; }
-  }
-  header {
-    background: #000;
-    padding: 20px;
-    border-bottom: 6px solid #00b8ff;
-  }
-  h1 {
-    font-size: 3em;
-    margin: 0;
-  }
-  .cn-logo {
-    background: #fff;
-    color: #000;
-    padding: 10px 20px;
-    border: 4px solid #000;
-    box-shadow: 5px 5px 0 #00b8ff;
-  }
-  main {
-    padding: 40px 0;
-  }
-  #player {
-    margin: 20px auto;
-    border: 10px solid #00b8ff;
-    background: #000;
-    width: 800px;
-    height: 600px;
-    box-shadow: 0 0 30px #00b8ff;
-    display: inline-block;
-  }
-  button {
-    background: #00b8ff;
-    border: 3px solid #000;
-    color: #000;
-    font-weight: bold;
-    font-size: 1.1em;
-    margin: 10px 8px;
-    padding: 10px 25px;
-    cursor: pointer;
-    box-shadow: 4px 4px 0 #000;
-    transition: all 0.15s ease-in-out;
-  }
-  button:hover {
-    transform: scale(1.05);
-    box-shadow: 6px 6px 0 #000;
-  }
-  footer {
-    font-size: 0.8em;
-    margin-top: 30px;
-    color: #bbb;
-  }
-  footer a { color: #00b8ff; text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
+/* -------------------- Global -------------------- */
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: #fff;
+  font-family: "Arial Black", sans-serif;
+  text-align: center;
+  overflow-x: hidden;
+  transition: background 0.6s ease;
+}
+button {
+  background: #00b8ff;
+  border: 3px solid #000;
+  color: #000;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin: 10px;
+  padding: 10px 25px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  transition: all 0.15s ease-in-out;
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 6px 6px 0 #000;
+}
 
-  /* Controls modal */
-  #controlsModal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #111;
-    border: 4px solid #00b8ff;
-    padding: 20px;
-    color: #fff;
-    z-index: 1000;
-    box-shadow: 0 0 25px #00b8ff;
-    width: 300px;
-    text-align: left;
-  }
-  #controlsModal h2 {
-    text-align: center;
-  }
-  .control-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-  }
-  .keyButton {
-    background: #00b8ff;
-    color: #000;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  #overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 999;
-  }
+/* -------------------- Transitions -------------------- */
+.page {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.page.active {
+  display: block;
+  opacity: 1;
+}
+
+/* -------------------- Main Menu -------------------- */
+#mainMenu {
+  background: linear-gradient(180deg, #000, #111);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#mainMenu h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+.cn-logo {
+  background: #fff;
+  color: #000;
+  padding: 10px 20px;
+  border: 4px solid #000;
+  box-shadow: 5px 5px 0 #00b8ff;
+}
+
+/* -------------------- Web Player Mode -------------------- */
+#webPlayer header {
+  background-color: #000;
+  padding: 15px;
+}
+#webPlayer header img { width: 180px; }
+
+#webPlayer nav {
+  background-color: #111;
+  padding: 10px;
+}
+#webPlayer nav a {
+  color: #fff;
+  margin: 0 12px;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-decoration: none;
+}
+#webPlayer nav a:hover { text-decoration: underline; }
+
+.main-content {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 20px;
+}
+.left, .right { width: 45%; min-width: 300px; }
+.left ul, .right ul { list-style: none; padding: 0; }
+.left li, .right li { padding: 5px 0; }
+
+.player-container {
+  background-color: #111;
+  padding: 20px;
+  margin: 20px auto;
+  border: 2px solid #fff;
+  width: 80%;
+  max-width: 900px;
+  text-align: center;
+}
+video {
+  width: 90%;
+  max-width: 100%;
+  border: 2px solid #fff;
+}
+#playlist {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+.standalone-video, .folder, .video-item {
+  background-color: #222;
+  margin: 5px 0;
+  padding: 5px 10px;
+  border: 1px solid #fff;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+button.delete {
+  background-color: #f00;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  border-radius: 50%;
+  padding: 0;
+}
+button.delete:hover { background-color: #ff4444; }
+
+#settingsPanel {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  background-color: #222;
+  color: #fff;
+  padding: 15px;
+  display: none;
+  border: 1px solid #fff;
+}
+
+footer {
+  background-color: #111;
+  text-align: center;
+  padding: 10px;
+  margin-top: 30px;
+  border-top: 1px solid #fff;
+}
+
+/* -------------------- Flash Player Mode -------------------- */
+#flashPlayer {
+  background: repeating-linear-gradient(45deg, #000 0, #000 25px, #fff 25px, #fff 50px);
+  background-size: 200% 200%;
+  animation: checkerMove 8s linear infinite;
+}
+@keyframes checkerMove {
+  from { background-position: 0 0; }
+  to { background-position: 100% 100%; }
+}
+#flashPlayer header {
+  background: #000;
+  padding: 20px;
+  border-bottom: 6px solid #00b8ff;
+}
+#flashPlayer h1 {
+  font-size: 3em;
+  margin: 0;
+}
+#flashPlayer #player {
+  margin: 20px auto;
+  border: 10px solid #00b8ff;
+  background: #000;
+  width: 800px;
+  height: 600px;
+  box-shadow: 0 0 30px #00b8ff;
+  display: inline-block;
+}
+#flashPlayer footer {
+  font-size: 0.8em;
+  margin-top: 30px;
+  color: #bbb;
+}
+#flashPlayer footer a { color: #00b8ff; }
 </style>
 </head>
 <body>
+
+<!-- -------------------- MAIN MENU -------------------- -->
+<div id="mainMenu" class="page active">
+  <h1><span class="cn-logo">CN</span> Player Hub</h1>
+  <p>Choose your experience:</p>
+  <button id="openWebPlayer">🎬 Cartoon Network Web Player</button>
+  <button id="openFlashPlayer">💾 Cartoon Network Flash Player</button>
+</div>
+
+<!-- -------------------- WEB PLAYER PAGE -------------------- -->
+<div id="webPlayer" class="page">
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Cartoon_Network_2010_logo.svg" alt="CN Logo">
+  </header>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Shows</a>
+    <a href="#">Games</a>
+    <a href="#">Videos</a>
+    <a href="#">Fun</a>
+  </nav>
+
+  <div class="main-content">
+    <div class="left">
+      <h2>Featured Shows</h2>
+      <ul>
+        <li><a href="#">The Powerpuff Girls</a></li>
+        <li><a href="#">Dexter's Laboratory</a></li>
+        <li><a href="#">Johnny Bravo</a></li>
+        <li><a href="#">Ed, Edd n Eddy</a></li>
+      </ul>
+    </div>
+    <div class="right">
+      <h2>Latest Videos</h2>
+      <ul>
+        <li><a href="#">Powerpuff Girls Episode 1</a></li>
+        <li><a href="#">Dexter's Lab Episode 1</a></li>
+        <li><a href="#">Johnny Bravo Episode 1</a></li>
+        <li><a href="#">Ed, Edd n Eddy Episode 1</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="player-container">
+    <video id="videoPlayer" controls></video>
+    <div>
+      <button id="playBtn">▶ Play</button>
+      <button id="pauseBtn">⏸ Pause</button>
+      <button id="restartBtn">🔄 Restart</button>
+      <button id="stopBtn">⏹ Stop</button>
+    </div>
+    <button id="createFolder">📁 Add Folder</button>
+    <ul id="playlist"></ul>
+    <div>
+      <label class="file-btn" for="uploadVideo">Upload Video</label>
+      <input type="file" id="uploadVideo" accept="video/*">
+    </div>
+  </div>
+
+  <button id="settingsToggle">⚙ Settings</button>
+  <div id="settingsPanel">
+    <h3>Settings</h3>
+    <label><input type="checkbox" id="legacyToggle"> Enable Legacy Mode</label>
+  </div>
+
+  <footer>
+    <p>&copy; 2002 Cartoon Network. All Rights Reserved.</p>
+    <button class="backBtn">⬅ Return to Menu</button>
+  </footer>
+</div>
+
+<!-- -------------------- FLASH PLAYER PAGE -------------------- -->
+<div id="flashPlayer" class="page">
   <header>
     <h1><span class="cn-logo">CN</span> Flash Player</h1>
     <p>Relive the golden age of Cartoon Network Flash games!</p>
@@ -126,114 +274,101 @@
   <main>
     <div id="player"></div>
     <br>
-    <input type="file" id="fileInput" accept=".swf" />
+    <input type="file" id="fileInput" accept=".swf">
     <br>
     <button id="playButton">▶ Play</button>
-    <button id="controlsButton">🎮 Controls</button>
   </main>
-
-  <div id="overlay"></div>
-  <div id="controlsModal">
-    <h2>Customize Controls</h2>
-    <div class="control-row"><span>Move Left:</span> <button class="keyButton" data-action="left"></button></div>
-    <div class="control-row"><span>Move Right:</span> <button class="keyButton" data-action="right"></button></div>
-    <div class="control-row"><span>Jump:</span> <button class="keyButton" data-action="jump"></button></div>
-    <div class="control-row"><span>Action:</span> <button class="keyButton" data-action="action"></button></div>
-    <button id="closeControls">Close</button>
-  </div>
 
   <footer>
     <p>Fan-made Flash emulator powered by <a href="https://ruffle.rs" target="_blank">Ruffle</a>.<br>
     © Cartoon Network belongs to Warner Bros. Discovery.</p>
+    <button class="backBtn">⬅ Return to Menu</button>
   </footer>
+</div>
 
-  <script>
-    const defaultControls = {
-      left: "ArrowLeft",
-      right: "ArrowRight",
-      jump: "Space",
-      action: "Enter"
+<script>
+/* ---------- Page Navigation ---------- */
+const pages = document.querySelectorAll(".page");
+function showPage(id) {
+  pages.forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+document.getElementById("openWebPlayer").onclick = () => showPage("webPlayer");
+document.getElementById("openFlashPlayer").onclick = () => showPage("flashPlayer");
+document.querySelectorAll(".backBtn").forEach(btn => btn.onclick = () => showPage("mainMenu"));
+
+/* ---------- Web Player Logic ---------- */
+const videoPlayer = document.getElementById('videoPlayer');
+document.getElementById('playBtn').onclick = ()=> videoPlayer.play();
+document.getElementById('pauseBtn').onclick = ()=> videoPlayer.pause();
+document.getElementById('restartBtn').onclick = ()=> { videoPlayer.currentTime=0; videoPlayer.play(); }
+document.getElementById('stopBtn').onclick = ()=> { videoPlayer.pause(); videoPlayer.currentTime=0; }
+
+let folders = JSON.parse(localStorage.getItem('cnFolders') || '[]');
+let standaloneVideos = JSON.parse(localStorage.getItem('cnStandalone') || '[]');
+const playlistEl = document.getElementById('playlist');
+function saveData() {
+  localStorage.setItem('cnFolders', JSON.stringify(folders));
+  localStorage.setItem('cnStandalone', JSON.stringify(standaloneVideos));
+}
+function renderPlaylist() {
+  playlistEl.innerHTML='';
+  standaloneVideos.forEach((video,index)=>{
+    const li = document.createElement('li'); li.className='standalone-video'; li.textContent=video.name;
+    li.onclick=()=>{ videoPlayer.src=video.url; videoPlayer.play(); }
+    const delBtn = document.createElement('button'); delBtn.className='delete'; delBtn.textContent='✖';
+    delBtn.onclick=(e)=>{ e.stopPropagation(); standaloneVideos.splice(index,1); saveData(); renderPlaylist(); }
+    li.appendChild(delBtn); playlistEl.appendChild(li);
+  });
+  folders.forEach((folder,index)=>{
+    const folderLi = document.createElement('li'); folderLi.className='folder';
+    const header = document.createElement('div'); header.textContent=folder.name;
+    const delBtn = document.createElement('button'); delBtn.className='delete'; delBtn.textContent='✖';
+    delBtn.onclick=(e)=>{ e.stopPropagation(); folders.splice(index,1); saveData(); renderPlaylist(); }
+    header.appendChild(delBtn); folderLi.appendChild(header);
+    playlistEl.appendChild(folderLi);
+  });
+}
+document.getElementById('createFolder').onclick=()=>{
+  const name = prompt("Enter Folder Name:"); if(!name) return;
+  folders.push({name,videos:[]}); saveData(); renderPlaylist();
+};
+document.getElementById('uploadVideo').onchange=(e)=>{
+  const file=e.target.files[0]; if(!file) return;
+  standaloneVideos.push({name:file.name,url:URL.createObjectURL(file)}); saveData(); renderPlaylist();
+};
+const settingsPanel = document.getElementById('settingsPanel');
+document.getElementById('settingsToggle').onclick=()=> settingsPanel.style.display = settingsPanel.style.display==='block'?'none':'block';
+const legacyToggle = document.getElementById('legacyToggle');
+if(localStorage.getItem('legacyMode')==='true') { legacyToggle.checked=true; }
+legacyToggle.onchange=()=>{
+  if(legacyToggle.checked){
+    document.body.style.backgroundColor="#000";
+    document.querySelectorAll('.player-container, .main-content, nav').forEach(el=>el.style.border="2px solid #fff");
+  }
+  localStorage.setItem('legacyMode', legacyToggle.checked);
+};
+renderPlaylist();
+
+/* ---------- Flash Player Logic ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const ruffle = window.RufflePlayer?.newest();
+  const player = ruffle.createPlayer();
+  document.getElementById("player").appendChild(player);
+  const fileInput = document.getElementById("fileInput");
+  const playButton = document.getElementById("playButton");
+  playButton.addEventListener("click", () => {
+    const file = fileInput.files[0];
+    if (!file) return alert("Please select a SWF file first!");
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      player.load({ data: new Uint8Array(e.target.result) });
     };
+    reader.readAsArrayBuffer(file);
+  });
+});
+</script>
 
-    let controls = JSON.parse(localStorage.getItem("cnControls")) || defaultControls;
-
-    const updateButtons = () => {
-      document.querySelectorAll(".keyButton").forEach(btn => {
-        const action = btn.dataset.action;
-        btn.textContent = controls[action];
-      });
-    };
-
-    const openModal = () => {
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("controlsModal").style.display = "block";
-      updateButtons();
-    };
-
-    const closeModal = () => {
-      document.getElementById("overlay").style.display = "none";
-      document.getElementById("controlsModal").style.display = "none";
-    };
-
-    document.getElementById("controlsButton").onclick = openModal;
-    document.getElementById("closeControls").onclick = closeModal;
-    document.getElementById("overlay").onclick = closeModal;
-
-    document.querySelectorAll(".keyButton").forEach(btn => {
-      btn.addEventListener("click", () => {
-        btn.textContent = "Press a key...";
-        const action = btn.dataset.action;
-
-        const keyHandler = (e) => {
-          e.preventDefault();
-          controls[action] = e.code;
-          localStorage.setItem("cnControls", JSON.stringify(controls));
-          updateButtons();
-          window.removeEventListener("keydown", keyHandler);
-        };
-        window.addEventListener("keydown", keyHandler);
-      });
-    });
-
-    // Ruffle setup
-    document.addEventListener("DOMContentLoaded", () => {
-      const ruffle = window.RufflePlayer?.newest();
-      const player = ruffle.createPlayer();
-      document.getElementById("player").appendChild(player);
-
-      const fileInput = document.getElementById("fileInput");
-      const playButton = document.getElementById("playButton");
-
-      playButton.addEventListener("click", () => {
-        const file = fileInput.files[0];
-        if (!file) return alert("Please select a SWF file first!");
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          player.load({ data: new Uint8Array(e.target.result) });
-        };
-        reader.readAsArrayBuffer(file);
-      });
-
-      // Remap key events
-      window.addEventListener("keydown", (e) => {
-        for (const [action, key] of Object.entries(controls)) {
-          if (e.code === key) {
-            let mappedKey;
-            switch (action) {
-              case "left": mappedKey = "ArrowLeft"; break;
-              case "right": mappedKey = "ArrowRight"; break;
-              case "jump": mappedKey = "Space"; break;
-              case "action": mappedKey = "Enter"; break;
-            }
-            if (mappedKey) {
-              const event = new KeyboardEvent("keydown", { key: mappedKey, code: mappedKey });
-              document.querySelector("ruffle-player")?.dispatchEvent(event);
-              e.preventDefault();
-            }
-          }
-        }
-      });
-    });
-  </script>
 </body>
 </html>
+
