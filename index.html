@@ -1,374 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cartoon Network Player Hub</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cartoon Network — Classic Hub</title>
 <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 <style>
-/* -------------------- Global -------------------- */
-body {
-  margin: 0;
-  padding: 0;
-  background: #000;
-  color: #fff;
-  font-family: "Arial Black", sans-serif;
-  text-align: center;
-  overflow-x: hidden;
-  transition: background 0.6s ease;
-}
-button {
-  background: #00b8ff;
-  border: 3px solid #000;
-  color: #000;
-  font-weight: bold;
-  font-size: 1.1em;
-  margin: 10px;
-  padding: 10px 25px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 #000;
-  transition: all 0.15s ease-in-out;
-}
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 6px 6px 0 #000;
-}
+  /* ---------- Retro site base ---------- */
+  :root {
+    --cn-blue: #0047b3;
+    --accent: #00b8ff;
+    --panel: #111;
+    --panel-2: #222;
+    --white: #fff;
+  }
+  html,body { height:100%; margin:0; font-family: "Arial Black","Impact", Arial, sans-serif; background:#000; color:var(--white); }
+  a { color: var(--cn-blue); text-decoration: underline; cursor: pointer; }
+  img { max-width:100%; display:block; }
 
-/* -------------------- Transitions -------------------- */
-.page {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-.page.active {
-  display: block;
-  opacity: 1;
-}
+  /* ---------- Header / nav ---------- */
+  .topbar {
+    background:#000;
+    border-bottom: 4px solid #111;
+    padding:8px 0 6px;
+    text-align:center;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.6) inset;
+  }
+  .cn-logo {
+    display:inline-block;
+    width:180px;
+    height:38px;
+    background: #fff;
+    color:#000;
+    font-weight:900;
+    line-height:38px;
+    border:4px solid #000;
+    box-shadow: 6px 6px 0 var(--accent);
+    margin-bottom:6px;
+    font-size:20px;
+  }
+  nav.mainnav {
+    background:#111;
+    padding:10px 0;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  nav.mainnav a { color: #fff; margin:0 18px; font-size:13px; text-decoration:none; }
+  nav.mainnav a:hover { text-decoration: underline; }
 
-/* -------------------- Main Menu -------------------- */
-#mainMenu {
-  background: linear-gradient(180deg, #000, #111);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-#mainMenu h1 {
-  font-size: 3em;
-  margin-bottom: 20px;
-}
-.cn-logo {
-  background: #fff;
-  color: #000;
-  padding: 10px 20px;
-  border: 4px solid #000;
-  box-shadow: 5px 5px 0 #00b8ff;
-}
+  /* ---------- Layout ---------- */
+  .container {
+    max-width:1100px;
+    margin: 24px auto;
+    padding: 0 18px;
+  }
+  .hero {
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+    justify-content:space-between;
+  }
+  .col {
+    width:48%;
+    min-width:260px;
+  }
+  h2 { font-size:28px; margin:6px 0 12px; color:#fff; text-shadow: 0 1px 0 #000; }
+  ul.classic-links { padding:0; margin:0; list-style:none; }
+  ul.classic-links li { margin:12px 0; }
+  ul.classic-links li a { color: #0027a8; text-decoration: underline; font-weight:700; background:transparent; padding:2px 0; }
 
-/* -------------------- Web Player Mode -------------------- */
-#webPlayer header {
-  background-color: #000;
-  padding: 15px;
-}
-#webPlayer header img { width: 180px; }
+  /* ---------- Player panel ---------- */
+  .panel {
+    background: linear-gradient(#111,#0d0d0d);
+    border:3px solid #fff;
+    padding:14px;
+    margin-top:18px;
+    box-shadow: 0 6px 0 #000;
+  }
+  .controls { margin-top:12px; }
+  .btn {
+    display:inline-block;
+    background:var(--accent);
+    border:3px solid #000;
+    color:#000;
+    font-weight:900;
+    padding:8px 14px;
+    margin:6px 6px;
+    cursor:pointer;
+    box-shadow: 4px 4px 0 #000;
+  }
+  .btn:hover { transform:translateY(-2px); box-shadow:6px 6px 0 #000; }
 
-#webPlayer nav {
-  background-color: #111;
-  padding: 10px;
-}
-#webPlayer nav a {
-  color: #fff;
-  margin: 0 12px;
-  font-size: 14px;
-  text-transform: uppercase;
-  font-weight: bold;
-  text-decoration: none;
-}
-#webPlayer nav a:hover { text-decoration: underline; }
+  /* ---------- Hub footer bar / checker strip ---------- */
+  .checker-strip {
+    height:28px;
+    background: repeating-linear-gradient(45deg,#000 0,#000 12px,#fff 12px,#fff 24px);
+    margin-top:36px;
+    border-top:3px solid #111;
+  }
 
-.main-content {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  margin: 20px;
-}
-.left, .right { width: 45%; min-width: 300px; }
-.left ul, .right ul { list-style: none; padding: 0; }
-.left li, .right li { padding: 5px 0; }
+  /* ---------- Pages (views) ---------- */
+  .page { display:none; opacity:0; transition: opacity .4s ease; min-height:60vh; }
+  .page.active { display:block; opacity:1; }
 
-.player-container {
-  background-color: #111;
-  padding: 20px;
-  margin: 20px auto;
-  border: 2px solid #fff;
-  width: 80%;
-  max-width: 900px;
-  text-align: center;
-}
-video {
-  width: 90%;
-  max-width: 100%;
-  border: 2px solid #fff;
-}
-#playlist {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-}
-.standalone-video, .folder, .video-item {
-  background-color: #222;
-  margin: 5px 0;
-  padding: 5px 10px;
-  border: 1px solid #fff;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-button.delete {
-  background-color: #f00;
-  color: #fff;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  border-radius: 50%;
-  padding: 0;
-}
-button.delete:hover { background-color: #ff4444; }
+  /* ---------- Web player specifics ---------- */
+  .player-box { text-align:center; }
+  video#webVideo { width:92%; max-width:820px; border:3px solid #fff; background:#000; display:block; margin:14px auto; }
+  #playlist { margin-top:12px; list-style:none; padding:0; text-align:left; max-width:820px; margin-left:auto; margin-right:auto; }
+  .playlist-item {
+    background: #161616; border:1px solid #fff; padding:8px 10px; margin:6px 0; display:flex; justify-content:space-between; align-items:center;
+  }
+  .small { font-size:12px; color:#ccc; }
 
-#settingsPanel {
-  position: fixed;
-  top: 60px;
-  right: 20px;
-  background-color: #222;
-  color: #fff;
-  padding: 15px;
-  display: none;
-  border: 1px solid #fff;
-}
+  /* ---------- Flash player specifics ---------- */
+  #flashView { padding:20px 0; text-align:center; }
+  #ruffleContainer {
+    margin: 12px auto;
+    width:90%;
+    max-width:840px;
+    height:60vh;
+    border:12px solid var(--accent);
+    background:#000;
+    box-shadow:0 0 30px var(--accent);
+    display:flex; align-items:center; justify-content:center;
+  }
 
-footer {
-  background-color: #111;
-  text-align: center;
-  padding: 10px;
-  margin-top: 30px;
-  border-top: 1px solid #fff;
-}
+  /* Animated checker background ONLY for flash view outer container */
+  .flash-bg {
+    background: repeating-linear-gradient(45deg,#000 0,#000 25px,#fff 25px,#fff 50px);
+    background-size:200% 200%;
+    animation: moveChecker 8s linear infinite;
+    padding-bottom:36px;
+  }
+  @keyframes moveChecker { from{ background-position:0 0 } to{ background-position:100% 100% } }
 
-/* -------------------- Flash Player Mode -------------------- */
-#flashPlayer {
-  background: repeating-linear-gradient(45deg, #000 0, #000 25px, #fff 25px, #fff 50px);
-  background-size: 200% 200%;
-  animation: checkerMove 8s linear infinite;
-}
-@keyframes checkerMove {
-  from { background-position: 0 0; }
-  to { background-position: 100% 100%; }
-}
-#flashPlayer header {
-  background: #000;
-  padding: 20px;
-  border-bottom: 6px solid #00b8ff;
-}
-#flashPlayer h1 {
-  font-size: 3em;
-  margin: 0;
-}
-#flashPlayer #player {
-  margin: 20px auto;
-  border: 10px solid #00b8ff;
-  background: #000;
-  width: 800px;
-  height: 600px;
-  box-shadow: 0 0 30px #00b8ff;
-  display: inline-block;
-}
-#flashPlayer footer {
-  font-size: 0.8em;
-  margin-top: 30px;
-  color: #bbb;
-}
-#flashPlayer footer a { color: #00b8ff; }
+  /* return button fixed bottom-left for ease */
+  .return-row { margin-top:16px; text-align:center; }
+  .back-btn { background:#fff200; border:3px solid #000; padding:8px 12px; font-weight:900; color:#000; cursor:pointer; box-shadow:4px 4px 0 #000; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:880px){
+    .hero { flex-direction:column; }
+    .col { width:100%; }
+    #ruffleContainer { height:48vh; }
+  }
 </style>
 </head>
 <body>
 
-<!-- -------------------- MAIN MENU -------------------- -->
-<div id="mainMenu" class="page active">
-  <h1><span class="cn-logo">CN</span> Player Hub</h1>
-  <p>Choose your experience:</p>
-  <button id="openWebPlayer">🎬 Cartoon Network Web Player</button>
-  <button id="openFlashPlayer">💾 Cartoon Network Flash Player</button>
-</div>
-
-<!-- -------------------- WEB PLAYER PAGE -------------------- -->
-<div id="webPlayer" class="page">
-  <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Cartoon_Network_2010_logo.svg" alt="CN Logo">
-  </header>
-  <nav>
-    <a href="#">Home</a>
-    <a href="#">Shows</a>
-    <a href="#">Games</a>
-    <a href="#">Videos</a>
-    <a href="#">Fun</a>
-  </nav>
-
-  <div class="main-content">
-    <div class="left">
-      <h2>Featured Shows</h2>
-      <ul>
-        <li><a href="#">The Powerpuff Girls</a></li>
-        <li><a href="#">Dexter's Laboratory</a></li>
-        <li><a href="#">Johnny Bravo</a></li>
-        <li><a href="#">Ed, Edd n Eddy</a></li>
-      </ul>
+  <!-- MAIN HUB -->
+  <div id="hubPage" class="page active">
+    <div class="topbar">
+      <div class="cn-logo" aria-hidden="true">CN</div>
     </div>
-    <div class="right">
-      <h2>Latest Videos</h2>
-      <ul>
-        <li><a href="#">Powerpuff Girls Episode 1</a></li>
-        <li><a href="#">Dexter's Lab Episode 1</a></li>
-        <li><a href="#">Johnny Bravo Episode 1</a></li>
-        <li><a href="#">Ed, Edd n Eddy Episode 1</a></li>
-      </ul>
+    <nav class="mainnav">
+      <a>Home</a><a>Shows</a><a>Games</a><a>Videos</a><a>Fun</a>
+    </nav>
+
+    <div class="container">
+      <div class="hero">
+        <div class="col">
+          <h2>Featured Shows</h2>
+          <ul class="classic-links">
+            <li><a id="linkPowerpuff">The Powerpuff Girls</a></li>
+            <li><a id="linkDexter">Dexter's Laboratory</a></li>
+            <li><a id="linkJohnny">Johnny Bravo</a></li>
+            <li><a id="linkEd">Ed, Edd n Eddy</a></li>
+          </ul>
+
+          <div class="panel" style="margin-top:18px;">
+            <strong>Watch / Play</strong>
+            <div class="controls" style="margin-top:8px;">
+              <button class="btn" id="openWeb">🎬 Cartoon Network Web Player</button>
+              <button class="btn" id="openFlash">💾 Cartoon Network Flash Player (Ruffle)</button>
+            </div>
+            <p class="small" style="margin-top:10px">Tip: upload a video or a SWF to try it locally</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <h2>Latest Videos</h2>
+          <ul class="classic-links">
+            <li><a>Powerpuff Girls Episode 1</a></li>
+            <li><a>Dexter's Lab Episode 1</a></li>
+            <li><a>Johnny Bravo Episode 1</a></li>
+            <li><a>Ed, Edd n Eddy Episode 1</a></li>
+          </ul>
+
+          <div class="panel" style="margin-top:18px; text-align:center;">
+            <strong>Quick Demo</strong>
+            <div style="margin-top:10px;">
+              <!-- small sample video (CORS safe) or local if available -->
+              <video id="hubSample" width="340" height="190" muted loop playsinline>
+                <source src="" type="video/mp4">
+                <!-- if none, will be hidden -->
+              </video>
+            </div>
+            <p class="small" style="margin-top:8px">This is a visual mock of the 2002 site front page</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="checker-strip" aria-hidden="true"></div>
     </div>
   </div>
 
-  <div class="player-container">
-    <video id="videoPlayer" controls></video>
-    <div>
-      <button id="playBtn">▶ Play</button>
-      <button id="pauseBtn">⏸ Pause</button>
-      <button id="restartBtn">🔄 Restart</button>
-      <button id="stopBtn">⏹ Stop</button>
+  <!-- WEB PLAYER PAGE -->
+  <div id="webPage" class="page">
+    <div class="topbar">
+      <div class="cn-logo">CN</div>
     </div>
-    <button id="createFolder">📁 Add Folder</button>
-    <ul id="playlist"></ul>
-    <div>
-      <label class="file-btn" for="uploadVideo">Upload Video</label>
-      <input type="file" id="uploadVideo" accept="video/*">
+    <nav class="mainnav"><a>Home</a><a>Shows</a><a>Games</a><a>Videos</a><a>Fun</a></nav>
+
+    <div class="container">
+      <div class="panel player-box">
+        <h2 style="margin-bottom:6px">Cartoon Network Web Player</h2>
+        <div class="small" style="margin-bottom:8px">2002 style video player — upload MP4 WEBM or play from playlist</div>
+
+        <video id="webVideo" controls></video>
+
+        <div class="controls">
+          <button class="btn" id="playVideo">▶ Play</button>
+          <button class="btn" id="pauseVideo">⏸ Pause</button>
+          <button class="btn" id="restartVideo">🔄 Restart</button>
+          <button class="btn" id="stopVideo">⏹ Stop</button>
+          <button class="back-btn" id="backFromWeb">⬅ Return to Hub</button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label class="btn" for="videoUpload">Upload Video</label>
+          <input id="videoUpload" type="file" accept="video/*" style="display:none">
+          <button class="btn" id="addFolder">📁 Add Folder</button>
+        </div>
+
+        <ul id="playlist"></ul>
+      </div>
     </div>
+
+    <div style="height:28px"></div>
   </div>
 
-  <button id="settingsToggle">⚙ Settings</button>
-  <div id="settingsPanel">
-    <h3>Settings</h3>
-    <label><input type="checkbox" id="legacyToggle"> Enable Legacy Mode</label>
+  <!-- FLASH PLAYER PAGE -->
+  <div id="flashPage" class="page">
+    <div class="flash-bg">
+      <div class="topbar">
+        <div class="cn-logo">CN</div>
+      </div>
+      <nav class="mainnav"><a>Home</a><a>Shows</a><a>Games</a><a>Videos</a><a>Fun</a></nav>
+
+      <div id="flashView" class="container">
+        <div class="panel" style="padding:10px 16px;">
+          <h2 style="margin:8px 0">Cartoon Network Flash Player</h2>
+          <div id="ruffleContainer" aria-hidden="false">
+            <!-- Ruffle player will be inserted here -->
+            <div style="color:#666; font-weight:700;">No SWF loaded — choose a .swf file below</div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <input id="swfInput" type="file" accept=".swf" style="display:inline-block"/>
+            <button class="btn" id="loadSwf">▶ Load SWF</button>
+            <button class="back-btn" id="backFromFlash">⬅ Return to Hub</button>
+          </div>
+
+          <p class="small" style="margin-top:8px">Powered by Ruffle — local SWF files only</p>
+        </div>
+      </div>
+
+      <div style="height:36px"></div>
+    </div>
   </div>
-
-  <footer>
-    <p>&copy; 2002 Cartoon Network. All Rights Reserved.</p>
-    <button class="backBtn">⬅ Return to Menu</button>
-  </footer>
-</div>
-
-<!-- -------------------- FLASH PLAYER PAGE -------------------- -->
-<div id="flashPlayer" class="page">
-  <header>
-    <h1><span class="cn-logo">CN</span> Flash Player</h1>
-    <p>Relive the golden age of Cartoon Network Flash games!</p>
-  </header>
-
-  <main>
-    <div id="player"></div>
-    <br>
-    <input type="file" id="fileInput" accept=".swf">
-    <br>
-    <button id="playButton">▶ Play</button>
-  </main>
-
-  <footer>
-    <p>Fan-made Flash emulator powered by <a href="https://ruffle.rs" target="_blank">Ruffle</a>.<br>
-    © Cartoon Network belongs to Warner Bros. Discovery.</p>
-    <button class="backBtn">⬅ Return to Menu</button>
-  </footer>
-</div>
 
 <script>
-/* ---------- Page Navigation ---------- */
-const pages = document.querySelectorAll(".page");
-function showPage(id) {
-  pages.forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+/* ---------- Page navigation ---------- */
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
 }
-document.getElementById("openWebPlayer").onclick = () => showPage("webPlayer");
-document.getElementById("openFlashPlayer").onclick = () => showPage("flashPlayer");
-document.querySelectorAll(".backBtn").forEach(btn => btn.onclick = () => showPage("mainMenu"));
 
-/* ---------- Web Player Logic ---------- */
-const videoPlayer = document.getElementById('videoPlayer');
-document.getElementById('playBtn').onclick = ()=> videoPlayer.play();
-document.getElementById('pauseBtn').onclick = ()=> videoPlayer.pause();
-document.getElementById('restartBtn').onclick = ()=> { videoPlayer.currentTime=0; videoPlayer.play(); }
-document.getElementById('stopBtn').onclick = ()=> { videoPlayer.pause(); videoPlayer.currentTime=0; }
+/* Hook up menu buttons */
+document.getElementById('openWeb').addEventListener('click', ()=> show('webPage'));
+document.getElementById('openFlash').addEventListener('click', ()=> show('flashPage'));
+document.getElementById('backFromWeb').addEventListener('click', ()=> show('hubPage'));
+document.getElementById('backFromFlash').addEventListener('click', ()=> show('hubPage'));
 
-let folders = JSON.parse(localStorage.getItem('cnFolders') || '[]');
-let standaloneVideos = JSON.parse(localStorage.getItem('cnStandalone') || '[]');
-const playlistEl = document.getElementById('playlist');
-function saveData() {
-  localStorage.setItem('cnFolders', JSON.stringify(folders));
-  localStorage.setItem('cnStandalone', JSON.stringify(standaloneVideos));
-}
-function renderPlaylist() {
-  playlistEl.innerHTML='';
-  standaloneVideos.forEach((video,index)=>{
-    const li = document.createElement('li'); li.className='standalone-video'; li.textContent=video.name;
-    li.onclick=()=>{ videoPlayer.src=video.url; videoPlayer.play(); }
-    const delBtn = document.createElement('button'); delBtn.className='delete'; delBtn.textContent='✖';
-    delBtn.onclick=(e)=>{ e.stopPropagation(); standaloneVideos.splice(index,1); saveData(); renderPlaylist(); }
-    li.appendChild(delBtn); playlistEl.appendChild(li);
-  });
-  folders.forEach((folder,index)=>{
-    const folderLi = document.createElement('li'); folderLi.className='folder';
-    const header = document.createElement('div'); header.textContent=folder.name;
-    const delBtn = document.createElement('button'); delBtn.className='delete'; delBtn.textContent='✖';
-    delBtn.onclick=(e)=>{ e.stopPropagation(); folders.splice(index,1); saveData(); renderPlaylist(); }
-    header.appendChild(delBtn); folderLi.appendChild(header);
-    playlistEl.appendChild(folderLi);
-  });
-}
-document.getElementById('createFolder').onclick=()=>{
-  const name = prompt("Enter Folder Name:"); if(!name) return;
-  folders.push({name,videos:[]}); saveData(); renderPlaylist();
-};
-document.getElementById('uploadVideo').onchange=(e)=>{
-  const file=e.target.files[0]; if(!file) return;
-  standaloneVideos.push({name:file.name,url:URL.createObjectURL(file)}); saveData(); renderPlaylist();
-};
-const settingsPanel = document.getElementById('settingsPanel');
-document.getElementById('settingsToggle').onclick=()=> settingsPanel.style.display = settingsPanel.style.display==='block'?'none':'block';
-const legacyToggle = document.getElementById('legacyToggle');
-if(localStorage.getItem('legacyMode')==='true') { legacyToggle.checked=true; }
-legacyToggle.onchange=()=>{
-  if(legacyToggle.checked){
-    document.body.style.backgroundColor="#000";
-    document.querySelectorAll('.player-container, .main-content, nav').forEach(el=>el.style.border="2px solid #fff");
-  }
-  localStorage.setItem('legacyMode', legacyToggle.checked);
-};
-renderPlaylist();
-
-/* ---------- Flash Player Logic ---------- */
-document.addEventListener("DOMContentLoaded", () => {
-  const ruffle = window.RufflePlayer?.newest();
-  const player = ruffle.createPlayer();
-  document.getElementById("player").appendChild(player);
-  const fileInput = document.getElementById("fileInput");
-  const playButton = document.getElementById("playButton");
-  playButton.addEventListener("click", () => {
-    const file = fileInput.files[0];
-    if (!file) return alert("Please select a SWF file first!");
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      player.load({ data: new Uint8Array(e.target.result) });
-    };
-    reader.readAsArrayBuffer(file);
+/* ---------- Classic link behavior (mock) ---------- */
+['linkPowerpuff','linkDexter','linkJohnny','linkEd'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', ()=> {
+    // navigate to web player and show a tiny message or play if playlist item exists
+    show('webPage');
+    // focus playlist
   });
 });
-</script>
 
+/* ---------- Web Player: upload + playlist (local only) ---------- */
+const webVideo = document.getElementById('webVideo');
+const upload = document.getElementById('videoUpload');
+const playlistEl = document.getElementById('playlist');
+let folders = JSON.parse(localStorage.getItem('cn_folders') || '[]');
+let standalone = JSON.parse(localStorage.getItem('cn_videos') || '[]');
+
+function saveWebData(){ localStorage.setItem('cn_folders', JSON.stringify(folders)); localStorage.setItem('cn_videos', JSON.stringify(standalone)); }
+function renderPlaylist(){
+  playlistEl.innerHTML = '';
+  standalone.forEach((v, i) => {
+    const li = document.createElement('li'); li.className='playlist-item';
+    const left = document.createElement('div'); left.style.flex='1';
+    left.innerHTML = `<strong style="color:#9cc"> ${v.name} </strong><div class="small">${v.size}</div>`;
+    li.appendChild(left);
+    const actions = document.createElement('div');
+    const playBtn = document.createElement('button'); playBtn.className='btn'; playBtn.textContent='Play';
+    playBtn.addEventListener('click', ()=> { webVideo.src = v.url; webVideo.play(); show('webPage'); });
+    const delBtn = document.createElement('button'); delBtn.className='btn'; delBtn.textContent='Del';
+    delBtn.addEventListener('click', ()=> { standalone.splice(i,1); saveWebData(); renderPlaylist(); });
+    actions.appendChild(playBtn); actions.appendChild(delBtn); li.appendChild(actions);
+    playlistEl.appendChild(li);
+  });
+
+  // folders (simple listing only)
+  folders.forEach((f, idx) => {
+    const li = document.createElement('li'); li.className='playlist-item';
+    li.innerHTML = `<div><strong>${f.name}</strong> <div class="small">Folder</div></div>`;
+    const del = document.createElement('button'); del.className='btn'; del.textContent='Del';
+    del.addEventListener('click', ()=> { folders.splice(idx,1); saveWebData(); renderPlaylist(); });
+    li.appendChild(del);
+    playlistEl.appendChild(li);
+  });
+}
+renderPlaylist();
+
+upload.addEventListener('change', (ev)=>{
+  const file = ev.target.files[0]; if(!file) return;
+  const url = URL.createObjectURL(file);
+  standalone.push({ name: file.name, url, size: `${Math.round(file.size/1024)} KB` });
+  saveWebData(); renderPlaylist();
+  // optionally auto play
+  webVideo.src = url; webVideo.play();
+});
+
+/* basic controls */
+document.getElementById('playVideo').addEventListener('click', ()=> webVideo.play());
+document.getElementById('pauseVideo').addEventListener('click', ()=> webVideo.pause());
+document.getElementById('restartVideo').addEventListener('click', ()=> { webVideo.currentTime = 0; webVideo.play(); });
+document.getElementById('stopVideo').addEventListener('click', ()=> { webVideo.pause(); webVideo.currentTime = 0; });
+
+document.getElementById('addFolder').addEventListener('click', ()=>{
+  const name = prompt('New folder name'); if(!name) return;
+  folders.push({ name, videos: [] }); saveWebData(); renderPlaylist();
+});
+
+/* ---------- Flash Player (Ruffle) ---------- */
+let rufflePlayer = null;
+function initRuffle(){
+  try {
+    const ruffle = window.RufflePlayer?.newest();
+    if(!ruffle) return;
+    rufflePlayer = ruffle.createPlayer();
+    const container = document.getElementById('ruffleContainer');
+    // clear placeholder
+    container.innerHTML = '';
+    container.appendChild(rufflePlayer);
+  } catch(e){
+    console.warn('Ruffle not available', e);
+  }
+}
+document.addEventListener('DOMContentLoaded', initRuffle);
+
+const swfInput = document.getElementById('swfInput');
+document.getElementById('loadSwf').addEventListener('click', ()=>{
+  const file = swfInput.files[0];
+  if(!file) return alert('Select a local SWF file first');
+  const reader = new FileReader();
+  reader.onload = (e)=> {
+    try {
+      const arr = new Uint8Array(e.target.result);
+      rufflePlayer.load({ data: arr });
+    } catch(err) {
+      alert('Failed to load SWF');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+/* Optional small UX: when returning to hub, stop any playing video */
+document.querySelectorAll('#backFromWeb, #backFromFlash').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    try { webVideo.pause(); } catch{}
+    // try to stop ruffle if possible — not necessary
+  });
+});
+
+/* On first load we show hubPage (already active). Provide keyboard shortcut H to return */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'h' || e.key === 'H') show('hubPage');
+});
+</script>
 </body>
 </html>
-
